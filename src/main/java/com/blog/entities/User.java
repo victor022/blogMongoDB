@@ -1,5 +1,7 @@
 package com.blog.entities;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
@@ -7,7 +9,12 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
-public class User {
+public class User implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	private String id;
@@ -21,9 +28,12 @@ public class User {
 	private String email;
 
 	public User() {
+		super();
 	}
 
-	public User(String name, String email) {
+	public User(String dni, String name, String email) {
+		super();
+		this.dni = dni;
 		this.name = name;
 		this.email = email;
 	}
