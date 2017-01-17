@@ -72,7 +72,7 @@ public class User implements Serializable{
 
 	@Override
 	public String toString() {
-		return String.format("User[id=%s, dni=%s, name='%s', email='%s']", id, dni, name, email);
+		return String.format("User[id=%s, dni=%s, name=%s, email=%s]", id, dni, name, email);
 	}
 
 }

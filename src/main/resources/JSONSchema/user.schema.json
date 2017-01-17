@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "title": "Schema of a user.",
+  "description": "Schema of a user",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "title": "ID used by MongoDB."
+    },
+    "dni": {
+      "type": "string",
+      "title": "user DNI."
+    },
+    "name": {
+      "type": "string",
+      "title": "user name."
+    },
+    "email": {
+      "type": "string",
+      "title": "user email."
+    }
+  },
+  "required": ["dni", "name", "email"]
+}

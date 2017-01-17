@@ -1,5 +1,7 @@
 package com.blog.integration;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +25,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.blog.entities.User;
+import com.blog.utils.JSONValidationUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.main.JsonSchema;
 
 /**
  * La persistencia se mantiene en BD una vez finalizados los Tests. No olvide
@@ -116,19 +121,20 @@ public class UserControllerTest {
 		Assert.assertTrue("User email is not equals.", user.getEmail().equals(emailUserTest));
 		Assert.assertTrue("User DNI is not equals.", user.getDni().equals(dniUserTest));
 	}
-	
+
 	@Test
 	public void test006UpdateUser() {
 		User userUpdated = this.restTemplate.getForEntity("/users/" + idUserTest, User.class).getBody();
 		userUpdated.setName("NewUser");
-		
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-		 
+
 		HttpEntity<User> entity = new HttpEntity<User>(userUpdated, headers);
-		
-		ResponseEntity<User> response = this.restTemplate.exchange("/users/dni/" + dniUserTest, HttpMethod.PUT, entity, User.class);
-		
+
+		ResponseEntity<User> response = this.restTemplate.exchange("/users/dni/" + dniUserTest, HttpMethod.PUT, entity,
+				User.class);
+
 		Assert.assertEquals(MediaType.APPLICATION_JSON_UTF8, response.getHeaders().getContentType());
 		Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
 		User user = response.getBody();
@@ -143,14 +149,14 @@ public class UserControllerTest {
 		JsonNode node = objectMapper.valueToTree(newUser);
 		Assert.assertTrue("User DNI is null.", node.hasNonNull("dni"));
 		Assert.assertTrue("User email is not equals.", node.get("email").textValue().equals(emailUserTest));
-		
+
 		ResponseEntity<JsonNode> response = this.restTemplate.postForEntity("/users", node, JsonNode.class);
 		Assert.assertEquals(MediaType.APPLICATION_JSON_UTF8, response.getHeaders().getContentType());
 		Assert.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-		
+
 		JsonNode userJson = response.getBody();
 		Assert.assertTrue("User email is not equals.", node.get("name").textValue().equals("IamJSON"));
-		
+
 		User user = objectMapper.convertValue(userJson, User.class);
 		Assert.assertTrue("User DNI is not equals.", user.getDni().equals(dniUserTest + "J"));
 		Assert.assertTrue("User name is not equals.", user.getName().equals("IamJSON"));
@@ -158,15 +164,29 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void test008DeleteUser() {
+	public void test008ValidateJSON() throws IOException, ProcessingException {
+		ResponseEntity<JsonNode> response = this.restTemplate.getForEntity("/users/dni/" + dniUserTest, JsonNode.class);
+		Assert.assertEquals(MediaType.APPLICATION_JSON_UTF8, response.getHeaders().getContentType());
+		Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+		JsonNode jsonNode = response.getBody();
+
+		ClassLoader classLoader = getClass().getClassLoader();
+		File fileSchema = new File(classLoader.getResource("JSONSchema/user.schema.json").getFile());
+		JsonSchema jsonSchema = JSONValidationUtils.getSchemaNode(fileSchema);
+
+		Assert.assertTrue("JSON is invalid.", JSONValidationUtils.isJsonValid(jsonSchema, jsonNode));
+	}
+
+	@Test
+	public void test009DeleteUser() {
 		ResponseEntity<String> response = restTemplate.exchange("/users/dni/" + dniUserTest, HttpMethod.DELETE, null,
 				String.class);
 		Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
 		Assert.assertEquals("Not equals.", response.getBody(), "User deleted");
 	}
-	
+
 	@Test
-	public void test009DeleteUserByName() {
+	public void test010DeleteUserByName() {
 		ResponseEntity<User[]> responseGet = this.restTemplate.getForEntity("/users/name/" + "IamJSON", User[].class);
 		Assert.assertEquals(MediaType.APPLICATION_JSON_UTF8, responseGet.getHeaders().getContentType());
 		Assert.assertEquals(HttpStatus.OK, responseGet.getStatusCode());
@@ -174,10 +194,9 @@ public class UserControllerTest {
 		Assert.assertTrue("User name is not equals.", user.getName().equals("IamJSON"));
 		Assert.assertTrue("User email is not equals.", user.getEmail().equals(emailUserTest));
 		Assert.assertTrue("User DNI is not equals.", user.getDni().equals(dniUserTest + "J"));
-		
-		
-		ResponseEntity<String> responseDelete = restTemplate.exchange("/users/dni/" + user.getDni(), HttpMethod.DELETE, null,
-				String.class);
+
+		ResponseEntity<String> responseDelete = restTemplate.exchange("/users/dni/" + user.getDni(), HttpMethod.DELETE,
+				null, String.class);
 		Assert.assertEquals(HttpStatus.OK, responseDelete.getStatusCode());
 		Assert.assertEquals("Not equals.", responseDelete.getBody(), "User deleted");
 	}

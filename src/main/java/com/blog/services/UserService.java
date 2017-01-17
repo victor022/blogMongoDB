@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.blog.entities.User;
 import com.blog.repositories.UserRepository;
+import com.google.common.base.Strings;
 
 @Service
 public class UserService {
@@ -60,6 +61,8 @@ public class UserService {
 		if (existUserWithDni(user.getDni())) {
 			LOG.warn("The user: {} exist in the DB", user);
 			throw new IllegalArgumentException();
+		} else if (!isUserValid(user)) {
+			throw new IllegalArgumentException();
 		} else {
 			repository.save(user);
 			LOG.info("Created user: {}", user);
@@ -70,6 +73,8 @@ public class UserService {
 	public User updateUser(String dni, User user) {
 		if (!existUser(user.getId())) {
 			LOG.warn("User with id {} not found", user.getId());
+			throw new IllegalArgumentException();
+		} else if (!isUserValid(user)) {
 			throw new IllegalArgumentException();
 		} else if (!existUserWithDni(dni)) {
 			LOG.warn("User with dni {} not found", dni);
@@ -88,6 +93,16 @@ public class UserService {
 		} else {
 			LOG.warn("The user with dni {} not exist in the DB", dni);
 			throw new IllegalArgumentException();
+		}
+	}
+
+	public boolean isUserValid(User user) {
+		if (Strings.isNullOrEmpty(user.getDni()) || Strings.isNullOrEmpty(user.getName())
+				|| Strings.isNullOrEmpty(user.getEmail())) {
+			LOG.warn("The user: {} is invalid.", user);
+			return false;
+		} else {
+			return true;
 		}
 	}
 
