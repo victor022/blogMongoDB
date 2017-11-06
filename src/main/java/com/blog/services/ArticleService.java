@@ -67,12 +67,9 @@ public class ArticleService {
 		}
 	}
 	
-	public Article updateArticle(String title, Article article) {
+	public Article updateArticle(Article article) {
 		if (!existArticle(article.getId())) {
 			LOG.warn("Article with id {} not found", article.getId());
-			throw new IllegalArgumentException();
-		} else if (!existArticleWithTitle(title)) {
-			LOG.warn("Article with title {} not found", title);
 			throw new IllegalArgumentException();
 		}
 		repository.save(article);
@@ -80,13 +77,13 @@ public class ArticleService {
 		return article;
 	}
 
-	public void deleteArticle(String title) {
-		Article article = repository.findByTitle(title);
+	public void deleteArticle(String id) {
+		Article article = repository.findOne(id);
 		if (article != null) {
 			repository.delete(article);
-			LOG.info("Deleted article with title: {}", title);
+			LOG.info("Deleted article with id: {}", id);
 		} else {
-			LOG.warn("The article with title {} not exist in the DB", title);
+			LOG.warn("The article with id {} not exist in the DB", id);
 			throw new IllegalArgumentException();
 		}
 	}
