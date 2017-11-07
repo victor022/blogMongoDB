@@ -7,9 +7,7 @@ import org.springframework.context.annotation.Import;
 
 @ComponentScan
 @Configuration
-@Import( {MongoConfig.class} )
+@Import( {MongoConfig.class, SwaggerConfig.class} )
 public class AppConfig {
-	
-
 
 }

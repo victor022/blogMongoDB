@@ -1,7 +1,9 @@
 package com.blog.services;
 
+import java.util.Date;
 import java.util.List;
 
+import com.blog.entities.Comment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,42 +27,14 @@ public class ArticleService {
 	public Article getArticle(String id){
 		return repository.findOne(id);
 	}
-	
-	public Article getArticleByTitle(String title){
-		return repository.findByTitle(title);
-	}
-	
-	public List<Article> getArticlesByAuthor(String author){
-		return repository.findByAuthor(author);
-	}
-	
-	public boolean existArticle(String id) {
-		Article article = repository.findOne(id);
-		if (article != null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
-	public boolean existArticle(Article article) {
-		return existArticle(article.getId());
-	}
-	
-	public boolean existArticleWithTitle(String title) {
-		Article article = getArticleByTitle(title);
-		if (article != null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
 	public Article createArticle(Article article) {
 		if (existArticleWithTitle(article.getTitle())) {
 			LOG.warn("The article: {} exist in the DB", article);
 			throw new IllegalArgumentException();
 		} else {
+			// Añadimos la fecha actual
+			article.setPublish_date(new Date());
 			repository.save(article);
 			LOG.info("Created article: {}", article);
 			return article;
@@ -88,4 +62,50 @@ public class ArticleService {
 		}
 	}
 
+	public Article getArticleByTitle(String title){
+		return repository.findByTitle(title);
+	}
+
+	public List<Article> getArticlesByAuthor(String author){
+		return repository.findByAuthor(author);
+	}
+
+	public boolean existArticle(String id) {
+		Article article = repository.findOne(id);
+		if (article != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean existArticle(Article article) {
+		return existArticle(article.getId());
+	}
+
+	public boolean existArticleWithTitle(String title) {
+		Article article = getArticleByTitle(title);
+		if (article != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public Article addComment(String idArticle, Comment comment) {
+		Article article = getArticle(idArticle);
+		if (article == null) {
+			LOG.warn("The article: {} not exist in the DB", idArticle);
+			throw new IllegalArgumentException();
+		} else {
+			// Añadimos la fecha actual
+			comment.setDate(new Date());
+			List<Comment> comments = article.getComments();
+			comments.add(comment);
+			article.setComments(comments);
+			repository.save(article);
+			LOG.info("Add comment: {}, to article {}", comment, idArticle);
+			return article;
+		}
+	}
 }

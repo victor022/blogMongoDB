@@ -43,6 +43,12 @@
 			<artifactId>springfox-swagger2</artifactId>
 			<version>2.7.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.7.0</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.github.fge/json-schema-validator -->
 		<dependency>
 			<groupId>com.github.fge</groupId>
