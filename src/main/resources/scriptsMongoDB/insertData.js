@@ -8,7 +8,7 @@ for (i=1 ; i <= 5 ; i ++) {
 	db.articles.insert({
 						title: "Title" + i,
 						author: "User" + i,
-						publish_date: ISODate("2013-10-02T01:11:18.965Z"),
+						publishDate: ISODate("2013-10-02T01:11:18.965Z"),
 						text: "Lorem ipsum ...",
 						comments: [
 							{

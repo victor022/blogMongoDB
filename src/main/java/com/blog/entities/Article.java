@@ -32,7 +32,7 @@ public class Article {
 
 	@ApiModelProperty(notes = "The publication date of the Article")
 	@DateTimeFormat(iso = ISO.DATE_TIME)
-	private Date publish_date;
+	private Date publishDate;
 
 	@ApiModelProperty(notes = "The text of the Article", required = true)
 	private String text;
@@ -42,11 +42,11 @@ public class Article {
 	private List<Comment> comments;
 
 		
-	public Article(String title, String author, Date publish_date, String text, ArrayList<Comment> comments) {
+	public Article(String title, String author, Date publishDate, String text, ArrayList<Comment> comments) {
 		super();
 		this.title = title;
 		this.author = author;
-		this.publish_date = publish_date;
+		this.publishDate = publishDate;
 		this.text = text;
 		this.comments = comments;
 	}

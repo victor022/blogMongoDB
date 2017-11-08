@@ -1,21 +1,19 @@
 package com.blog.services;
 
-import java.util.Date;
-import java.util.List;
-
+import com.blog.entities.Article;
 import com.blog.entities.Comment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.blog.repositories.ArticleRepository;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.blog.entities.Article;
-import com.blog.repositories.ArticleRepository;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class ArticleService {
 	
-	private final Logger LOG = LoggerFactory.getLogger(ArticleService.class);
+	private final Logger LOG = Logger.getLogger(ArticleService.class);
 	
 	@Autowired
 	private ArticleRepository repository;
@@ -30,24 +28,24 @@ public class ArticleService {
 
 	public Article createArticle(Article article) {
 		if (existArticleWithTitle(article.getTitle())) {
-			LOG.warn("The article: {} exist in the DB", article);
+			LOG.warn("The article with title: " + article.getTitle() + " exist in the DB");
 			throw new IllegalArgumentException();
 		} else {
 			// Añadimos la fecha actual
-			article.setPublish_date(new Date());
+			article.setPublishDate(new Date());
 			repository.save(article);
-			LOG.info("Created article: {}", article);
+			LOG.info("Created article: " + article.toString());
 			return article;
 		}
 	}
 	
 	public Article updateArticle(Article article) {
 		if (!existArticle(article.getId())) {
-			LOG.warn("Article with id {} not found", article.getId());
+			LOG.warn("Article with id: " + article.getId() + " not found");
 			throw new IllegalArgumentException();
 		}
 		repository.save(article);
-		LOG.info("Updated article: {}", article);
+		LOG.info("Updated article: " + article.toString());
 		return article;
 	}
 
@@ -55,9 +53,9 @@ public class ArticleService {
 		Article article = repository.findOne(id);
 		if (article != null) {
 			repository.delete(article);
-			LOG.info("Deleted article with id: {}", id);
+			LOG.info("Deleted article with id: " + id);
 		} else {
-			LOG.warn("The article with id {} not exist in the DB", id);
+			LOG.warn("The article with id:" + id + " not exist in the DB");
 			throw new IllegalArgumentException();
 		}
 	}
@@ -95,7 +93,7 @@ public class ArticleService {
 	public Article addComment(String idArticle, Comment comment) {
 		Article article = getArticle(idArticle);
 		if (article == null) {
-			LOG.warn("The article: {} not exist in the DB", idArticle);
+			LOG.warn("The article with id:" + idArticle + " not exist in the DB");
 			throw new IllegalArgumentException();
 		} else {
 			// Añadimos la fecha actual
@@ -104,7 +102,7 @@ public class ArticleService {
 			comments.add(comment);
 			article.setComments(comments);
 			repository.save(article);
-			LOG.info("Add comment: {}, to article {}", comment, idArticle);
+			LOG.info("Add comment: " + comment.toString() + ", to article with id:" + idArticle);
 			return article;
 		}
 	}
